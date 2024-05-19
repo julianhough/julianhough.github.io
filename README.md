@@ -1,2 +1,2 @@
 # julianhough.github.io
-Julian Hough's personal profesionally website.
+Julian Hough's personal profesional website.
