@@ -1,0 +1,13 @@
+\documentclass[12pt]{article}
+
+\begin{document}
+\title{Some stuff}
+
+
+\cite{ZarriessEtAl2016LREC} test.
+
+\bibliographystyle{plain}
+\bibliography{ZarriessEtAl16LREC}
+
+
+\end{document}

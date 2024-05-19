@@ -1,0 +1,36 @@
+\begin{thebibliography}{1}
+
+\bibitem{HoughPurver14EMNLP}
+Julian Hough and Matthew Purver.
+\newblock Strongly incremental repair detection.
+\newblock In {\em Proceedings of the 2014 Conference on Empirical Methods in
+  Natural Language Processing (EMNLP)}, pages 78--89, Doha, Qatar, October
+  2014. Association for Computational Linguistics.
+
+\bibitem{HoughPurver17TypeTheoryBookChapter}
+Julian Hough and Matthew Purver.
+\newblock {Probabilistic Record Type Lattices for Incremental Reference
+  Processing}.
+\newblock In Stergios Chatzikyriakidis and Zhaohui Luo, editors, {\em Modern
+  Perspectives in Type-Theoretical Semantics}, volume~98 of {\em Studies in
+  Linguistics and Philosophy}, pages 189--222. Springer International
+  Publishing, Feb 2017.
+
+\bibitem{HoughSchlangen17HRI}
+Julian Hough and David Schlangen.
+\newblock It's not what you do, it's how you do it: Grounding uncertainty for a
+  simple robot.
+\newblock In {\em Proceedings of the 2017 ACM/IEEE International Conference on
+  Human-Robot Interaction}, HRI '17, pages 274--282, New York, NY, USA, 2017.
+  ACM.
+
+\bibitem{hough-schlangen:2017:EACLlong}
+Julian Hough and David Schlangen.
+\newblock Joint, incremental disfluency detection and utterance segmentation
+  from speech.
+\newblock In {\em Proceedings of the 15th Conference of the European Chapter of
+  the Association for Computational Linguistics: Volume 1, Long Papers}, pages
+  326--336, Valencia, Spain, April 2017. Association for Computational
+  Linguistics.
+
+\end{thebibliography}

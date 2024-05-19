@@ -1,0 +1,39 @@
+\documentclass[12pt]{article}
+\usepackage{bibentry}
+
+\title{Key Publications}
+\author{Julian Hough}
+
+\begin{document}
+
+\maketitle
+
+\nobibliography{all} %name of your .bib file
+
+\begin{enumerate}
+\item\bibentry{HoughPurver14EMNLP}
+\begin{itemize}
+\item[] We present a system which achieves state-of-the-art results for incremental disfluency detection. It provides a new approach to incremental processing for the task and shows how incremental performance can be improved without losing utterance-final accuracy. We describe how a variety of novel linguistic features can be generated strictly word-by-word as utterances are consumed by the system, and that the processing complexity and incremental performance of the task can be formalized and evaluated. The linguistic features and incremental metrics are applicable more generally for speech and language processing tasks.
+\end{itemize}
+
+\item\bibentry{HoughSchlangen17HRI}\begin{itemize}
+\item[] We show how employing insights from dialogue theory with a grounding model, which estimates what is common ground between a user and a simple robot in real time according to the robot, can help a robot communicate its current level of uncertainty about the user's intentions in terms of understanding and confidence levels. In a live ratings study, the robot's understanding level is reliably communicated by how often it repairs its actions, while its confidence level can only be communicated when its actions are parameterized through different movement speeds and hesitation times. These results have significance for practical robots.
+\end{itemize}
+
+\item\bibentry{hough-schlangen:2017:EACLlong}\begin{itemize}
+\item[] We combine the tasks of utterance segmentation and disfluency detection for the first time, and show how the joint task formulation improves the performance of both tasks. Utterance segmentation in particular benefits by combining it with disfluency detection, and we show near state-of-the-art results. The paper also compares different deep neural network architectures (a vanilla RNN vs. an  LSTM) to see if the common difficulty of the vanishing gradient problem for recurrent neural nets can be overcome- there is an improvement on longer disfluencies with the LSTM. The paper also provides results on speech recognition results.
+\end{itemize}
+
+\item\bibentry{HoughPurver17TypeTheoryBookChapter}\begin{itemize}
+\item[] We formalize probabilistic type theory in terms of probabilistic lattices. This was applied to a specific problem in modelling attested psychological results in processing utterances in a simple reference resolution game where a user's speech is interpreted to refer to simple objects, but the framework is wide-ranging in scope. It opens the possibility for a general dialogue framework where the most relevant questions can be generated incrementally word-by-word, and also has the potential for a generative and interpretable language learning model.
+
+\end{itemize}
+
+\end{enumerate}
+
+
+\bibliographystyle{plain}
+
+
+
+\end{document}

@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: shadow_ref.aux
+The style file: plain.bst
+Database file #1: all.bib
+I was expecting a `,' or a `}'---line 257 of file all.bib
+ :   
+ :   year = 2011,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--empty booktitle in DeKokEtAl15ICMI
+Warning--empty booktitle in HoughSchlangen15InterSpeech
+You've used 12 entries,
+            2118 wiz_defined-function locations,
+            583 strings with 6927 characters,
+and the built_in function-call counts, 4965 in all, are:
+= -- 495
+> -- 248
+< -- 7
++ -- 97
+- -- 84
+* -- 342
+:= -- 793
+add.period$ -- 40
+call.type$ -- 12
+change.case$ -- 76
+chr.to.int$ -- 0
+cite$ -- 14
+duplicate$ -- 205
+empty$ -- 369
+format.name$ -- 84
+if$ -- 1071
+int.to.chr$ -- 0
+int.to.str$ -- 12
+missing$ -- 11
+newline$ -- 63
+num.names$ -- 26
+pop$ -- 88
+preamble$ -- 1
+purify$ -- 65
+quote$ -- 0
+skip$ -- 157
+stack$ -- 0
+substring$ -- 279
+swap$ -- 67
+text.length$ -- 7
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 48
+warning$ -- 2
+while$ -- 46
+width$ -- 14
+write$ -- 142
+(There was 1 error message)

@@ -1,0 +1,85 @@
+\begin{thebibliography}{10}
+
+\bibitem{DeKokEtAl15ICMI}
+Iwan de~Kok, Julian Hough, Felix H{\"u}lsmann, Mario Botsch, David Schlangen,
+  and Stefan Kopp.
+\newblock A multimodal system for real-time action instruction in motor skill
+  learning.
+\newblock Proceedings of ACM ICMI 17th ACM International Conference on
+  Multimodal Interaction, pages 355--362, 2015.
+
+\bibitem{HealeyEtAl16BBS}
+Patrick~G.T. Healey, Christine Howes, Julian Hough, and Matthew Purver.
+\newblock Better late than now-or-never: The case of interactive repair
+  phenomena.
+\newblock {\em Behavioural and Brain Sciences}, 39:e76, June 2016.
+
+\bibitem{Hough15Thesis}
+Julian Hough.
+\newblock {\em Modelling Incremental Self-Repair Processing in Dialogue}.
+\newblock PhD thesis, Queen Mary University of London, 2015.
+
+\bibitem{HoughPurver14EMNLP}
+Julian Hough and Matthew Purver.
+\newblock Strongly incremental repair detection.
+\newblock In {\em Proceedings of the 2014 Conference on Empirical Methods in
+  Natural Language Processing (EMNLP)}, pages 78--89, Doha, Qatar, October
+  2014. Association for Computational Linguistics.
+
+\bibitem{HoughPurver17TypeTheoryBookChapter}
+Julian Hough and Matthew Purver.
+\newblock {Probabilistic Record Type Lattices for Incremental Reference
+  Processing}.
+\newblock In Stergios Chatzikyriakidis and Zhaohui Luo, editors, {\em Modern
+  Perspectives in Type-Theoretical Semantics}, volume~98 of {\em Studies in
+  Linguistics and Philosophy}, pages 189--222. Springer International
+  Publishing, Feb 2017.
+
+\bibitem{HoughSchlangen15InterSpeech}
+Julian Hough and David Schlangen.
+\newblock Recurrent neural networks for incremental disfluency detection.
+\newblock Interspeech 2015, pages 849--853, 2015.
+
+\bibitem{HoughSchlangen17HRI}
+Julian Hough and David Schlangen.
+\newblock It's not what you do, it's how you do it: Grounding uncertainty for a
+  simple robot.
+\newblock In {\em Proceedings of the 2017 ACM/IEEE International Conference on
+  Human-Robot Interaction}, HRI '17, pages 274--282, New York, NY, USA, 2017.
+  ACM.
+
+\bibitem{hough-schlangen:2017:EACLlong}
+Julian Hough and David Schlangen.
+\newblock Joint, incremental disfluency detection and utterance segmentation
+  from speech.
+\newblock In {\em Proceedings of the 15th Conference of the European Chapter of
+  the Association for Computational Linguistics: Volume 1, Long Papers}, pages
+  326--336, Valencia, Spain, April 2017. Association for Computational
+  Linguistics.
+
+\bibitem{Hough-EtAl:2016:LREC2016}
+Julian Hough, Ye~Tian, Laura de~Ruiter, Simon Betz, David Schlangen, and
+  Jonathan Ginzburg.
+\newblock {DUEL: A Multi-lingual Multimodal Dialogue Corpus for Disfluency,
+  Exclamations and Laughter}.
+\newblock In {\em 10th edition of the Language Resources and Evaluation
+  Conference}, 2016.
+
+\bibitem{HowesEtAl13BBS}
+Christine Howes, Patrick G.~T. Healey, Arash Eshghi, and Julian Hough.
+\newblock “well, that's one way”: Interactivity in parsing and production.
+\newblock {\em Behavioral and Brain Sciences}, 36:359--359, 8 2013.
+
+\bibitem{PurverEtAl18Topics}
+Matthew Purver, Julian Hough, and Christine Howes.
+\newblock {C}omputational models of miscommunication phenomena.
+\newblock {\em TopiCS}, submitted, under review, 2017.
+
+\bibitem{ZarriessEtAl16LREC}
+Sina Zarrie{\ss}, Julian Hough, Casey Kennington, Ramesh Manuvinakurike, David
+  DeVault, Raquel Fern{\'a}ndez, and David Schlangen.
+\newblock {PentoRef: A Corpus of Spoken References in Task-oriented Dialogues}.
+\newblock In {\em 10th edition of the Language Resources and Evaluation
+  Conference}, Portoro\v{z} (Slovenia), 2016.
+
+\end{thebibliography}

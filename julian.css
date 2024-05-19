@@ -1,0 +1,45 @@
+body, td, p, h1, h2, h3, h4 { font: 11pt catriel, helvetica, arial, sans-serif; color: #000000 }
+
+body { background-image:url('background.png'); text-align: center; margin: 1em; }
+
+div.nav { background-color: #000000; color: #CCCCCC; font-size:14pt; margin: 0em 0em }
+div.main { margin: 3em 1em; }
+
+h1 { text-align: left; font-weight: bolder; font-size: 150%; color: #0000A0; text-decoration: none }
+h2 { text-align: left; font-weight: bold; font-size: 120%; color: #0000A0; text-decoration: none }
+h3 { text-align: left; font-weight: bold; font-size: 110%; text-decoration: underline }
+h4 { text-align: center; font-weight: bold: font-size: 100%; text-decoration: underline }
+
+table { border: none; text-align: left; font-size: 100%;}
+table.nav {border : none; background-color: #000000; color: #CCCCCC; font-size:14pt; margin: 0em 0em}
+
+a { color: #0000A0; text-decoration: none; cursor: pointer}
+a:hover, a:active { color: #808080; text-decoration: underline }
+a:visited { color: #0000A0; text-decoration: underline }
+a.nav { color: #222222 }
+a.nav:hover, a.nav:active { color: #ffffff; text-decoration: none }
+a.headline { color : #ffffff}
+
+p { text-align: left }
+p.nav { color: #ffffff }
+p.center { text-align: center }
+p.right { text-align: right }
+p.submenu1 { text-align: center }
+p.submenu2 { text-align: center; font-size: 90% }
+
+hr { clear: both }
+.clear { clear: both }
+.clearl { clear: left }
+.clearr { clear: right }
+
+img.box { border: 1px solid black }
+img.boxl { border: 1px solid black; float: left; }
+img.boxr { border: 1px solid black; float: right; }
+img.l { float: left; }
+img.r { float: right; }
+
+ul li { text-align: left }
+
+#front h1 {  }
+#front span.more { float: right; }
+#front p { border-top: 0; }

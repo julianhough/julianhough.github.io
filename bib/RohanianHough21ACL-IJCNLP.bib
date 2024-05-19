@@ -1,0 +1,14 @@
+@inproceedings{rohanian-hough-2021-best,
+    title = "Best of Both Worlds: Making High Accuracy Non-incremental Transformer-based Disfluency Detection Incremental",
+    author = "Rohanian, Morteza  and
+      Hough, Julian",
+    booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
+    month = aug,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.acl-long.286",
+    doi = "10.18653/v1/2021.acl-long.286",
+    pages = "3693--3703",
+    abstract = "While Transformer-based text classifiers pre-trained on large volumes of text have yielded significant improvements on a wide range of computational linguistics tasks, their implementations have been unsuitable for live incremental processing thus far, operating only on the level of complete sentence inputs. We address the challenge of introducing methods for word-by-word left-to-right incremental processing to Transformers such as BERT, models without an intrinsic sense of linear order. We modify the training method and live decoding of non-incremental models to detect speech disfluencies with minimum latency and without pre-segmentation of dialogue acts. We experiment with several decoding methods to predict the rightward context of the word currently being processed using a GPT-2 language model and apply a BERT-based disfluency detector to sequences, including predicted words. We show our method of incrementalising Transformers maintains most of their high non-incremental performance while operating strictly incrementally. We also evaluate our models{'} incremental performance to establish the trade-off between incremental performance and final performance, using different prediction strategies. We apply our system to incremental speech recognition results as they arrive into a live system and achieve state-of-the-art results in this setting.",
+}
