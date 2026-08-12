@@ -34,7 +34,7 @@ th, td {
   padding: 12px 14px;
 }
 th {
-  background: #fafafa;
+  background: #e6e6e6;
   text-align: left;
 }
 .audio-cell {
@@ -67,7 +67,7 @@ button {
   appearance: none;
   height: 10px;
   border-radius: 6px;
-  background: #f3f3f3;
+  background: #b0b0b0;
   cursor: pointer;
 }
 .track-progress input[type="range"]::-webkit-slider-thumb {
@@ -97,9 +97,16 @@ button:hover {
 .play-all-button {
   width: auto;
   height: auto;
-  font-size: 15px;
-  padding: 10px 16px;
-  margin-bottom: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 12px 20px;
+  margin-bottom: 18px;
+  background: #333;
+  color: #fff;
+  border-color: #222;
+}
+.play-all-button:hover {
+  background: #222;
 }
 </style>
 <script>
@@ -224,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <table>
     <thead>
       <tr>
-        <th>Track title</th>
+        <th>Track</th>
         <th>Player</th>
       </tr>
     </thead>
