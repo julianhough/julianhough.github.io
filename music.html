@@ -62,20 +62,29 @@ button {
   align-items: center;
   gap: 10px;
 }
-.track-progress progress {
+.track-progress input[type="range"] {
   width: 100%;
-  height: 10px;
   appearance: none;
-  border: 1px solid #bbb;
+  height: 10px;
   border-radius: 6px;
-  overflow: hidden;
+  background: #f3f3f3;
   cursor: pointer;
 }
-.track-progress progress::-webkit-progress-bar {
-  background: #f3f3f3;
-}
-.track-progress progress::-webkit-progress-value {
+.track-progress input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
   background: #4a90e2;
+  cursor: pointer;
+  margin-top: -2px;
+}
+.track-progress input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
 }
 .track-progress .time {
   min-width: 100px;
@@ -119,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   buttons.forEach(button => {
     const audio = document.getElementById(button.dataset.audioId);
     if (!audio) return;
-    const progress = button.parentElement.querySelector('progress');
+    const progress = button.parentElement.querySelector('input[type="range"]');
     const timeDisplay = button.parentElement.querySelector('.time');
 
     const updateTime = () => {
@@ -145,15 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (progress) {
-      progress.addEventListener('click', (event) => {
+      progress.addEventListener('input', (event) => {
         const activeTrack = tracks.find(track => !track.paused && !track.ended);
         if (activeTrack && activeTrack !== audio) return;
         if (!audio.duration) return;
-        const rect = progress.getBoundingClientRect();
-        const clickX = event.clientX - rect.left;
-        const ratio = Math.min(Math.max(clickX / rect.width, 0), 1);
+        const ratio = Number(event.target.value) / 100;
         audio.currentTime = ratio * audio.duration;
-        updateTime();
       });
     }
 
@@ -188,6 +194,22 @@ document.addEventListener('DOMContentLoaded', () => {
   playAllButton.addEventListener('click', () => {
     playAllActive = true;
     playAllIndex = 0;
+
+    tracks.forEach(track => {
+      track.pause();
+      track.currentTime = 0;
+    });
+
+    document.querySelectorAll('input[type="range"]').forEach(range => {
+      range.value = 0;
+    });
+    document.querySelectorAll('.time').forEach(timeEl => {
+      timeEl.textContent = '00:00 / --:--';
+    });
+    document.querySelectorAll('button[data-audio-id]').forEach(btn => {
+      btn.textContent = '▶';
+    });
+
     stopOtherTracks(tracks[0]);
     tracks[0].play();
   });
@@ -212,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="audio-cell">
           <button type="button" class="track-button" data-audio-id="track1">▶</button>
           <div class="track-progress">
-            <progress value="0" max="100"></progress>
+            <input type="range" min="0" max="100" step="0.1" value="0">
             <span class="time">00:00 / --:--</span>
           </div>
           <audio id="track1" src="music/Dead_are_dancing_too-quicker - 11:08:2026, 23.30.mp3"></audio>
@@ -223,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="audio-cell">
           <button type="button" class="track-button" data-audio-id="track3">▶</button>
           <div class="track-progress">
-            <progress value="0" max="100"></progress>
+            <input type="range" min="0" max="100" step="0.1" value="0">
             <span class="time">00:00 / --:--</span>
           </div>
           <audio id="track3" src="music/Lie_to_me_quicker - 13:07:2026, 09.50.mp3"></audio>
@@ -234,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="audio-cell">
           <button type="button" class="track-button" data-audio-id="track2">▶</button>
           <div class="track-progress">
-            <progress value="0" max="100"></progress>
+            <input type="range" min="0" max="100" step="0.1" value="0">
             <span class="time">00:00 / --:--</span>
           </div>
           <audio id="track2" src="music/After Dark in Am - 10:07:2026, 17.22.mp3"></audio>
@@ -245,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="audio-cell">
           <button type="button" class="track-button" data-audio-id="track4">▶</button>
           <div class="track-progress">
-            <progress value="0" max="100"></progress>
+            <input type="range" min="0" max="100" step="0.1" value="0">
             <span class="time">00:00 / --:--</span>
           </div>
           <audio id="track4" src="music/Need_it_like_a_song_quicker - 12:08:2026, 12.56.mp3"></audio>
@@ -256,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="audio-cell">
           <button type="button" class="track-button" data-audio-id="track5">▶</button>
           <div class="track-progress">
-            <progress value="0" max="100"></progress>
+            <input type="range" min="0" max="100" step="0.1" value="0">
             <span class="time">00:00 / --:--</span>
           </div>
           <audio id="track5" src="music/Nashville_quicker - 08:07:2026, 16.53.mp3"></audio>
