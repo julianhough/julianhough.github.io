@@ -8,13 +8,14 @@ body {
   background: #f2f2f2;
   margin: 0;
   padding: 24px;
+  font-size: 150%;
   color: #222;
 }
 .container {
   max-width: 900px;
   margin: 0 auto;
   background: #fff;
-  padding: 24px;
+  padding: 36px;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
@@ -29,13 +30,26 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+tbody tr { cursor: pointer; }
 th, td {
   border: 1px solid #d1d1d1;
-  padding: 12px 14px;
+  padding: 18px 21px;
 }
 th {
   background: #e6e6e6;
   text-align: left;
+}
+/* highlight the active (playing) table row */
+.active-row {
+  background: #fff59d;
+  box-shadow: inset 4px 0 0 0 #ffc107;
+  transition: background 0.12s ease;
+}
+/* ensure the whole row cells are highlighted */
+tbody tr.active-row td {
+  background: #fff59d;
+  color: #1a1a1a;
+  font-weight: 600;
 }
 .audio-cell {
   display: flex;
@@ -44,17 +58,17 @@ th {
 }
 button {
   font: inherit;
-  padding: 8px 14px;
+  padding: 12px 21px;
   border: 1px solid #999;
-  border-radius: 6px;
+  border-radius: 8px;
   background: #fff;
   cursor: pointer;
-  height: 40px;
-  font-size: 18px;
+  height: 60px;
+  font-size: 27px;
   line-height: 1;
 }
 .track-button {
-  width: 48px;
+  width: 72px;
 }
 .track-progress {
   flex: 1;
@@ -65,12 +79,72 @@ button {
 .track-progress input[type="range"] {
   width: 100%;
   appearance: none;
+  height: 15px;
+  border-radius: 8px;
+  background: #b0b0b0;
+  cursor: pointer;
+}
+.track-progress input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+  margin-top: -3px;
+}
+.track-progress input[type="range"]::-moz-range-thumb {
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+}
+.track-progress .time {
+  min-width: 120px;
+  color: #444;
+  font-size: 30px;
+}
+button:hover {
+  background: #f3f3f3;
+}
+.play-all-button {
+  width: auto;
+  height: auto;
+  font-size: 39px;
+  font-weight: 600;
+  padding: 18px 30px;
+  margin-bottom: 20px;
+  background: #333;
+  color: #fff;
+  border-color: #222;
+}
+.play-all-button:hover {
+  background: #222;
+}
+
+/* Now playing bar */
+#nowPlaying {
+  margin: 12px 0 18px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fafafa;
+  display: block;
+}
+#nowPlaying .now-label {
+  display: inline-block;
+  margin-right: 8px;
+  color: #333;
+}
+#nowRange {
+  width: 100%;
+  appearance: none;
   height: 10px;
   border-radius: 6px;
   background: #b0b0b0;
   cursor: pointer;
 }
-.track-progress input[type="range"]::-webkit-slider-thumb {
+#nowRange::-webkit-slider-thumb {
   appearance: none;
   width: 14px;
   height: 14px;
@@ -79,41 +153,24 @@ button {
   cursor: pointer;
   margin-top: -2px;
 }
-.track-progress input[type="range"]::-moz-range-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #4a90e2;
-  cursor: pointer;
-}
-.track-progress .time {
-  min-width: 100px;
-  color: #444;
-  font-size: 13px;
-}
-button:hover {
-  background: #f3f3f3;
-}
-.play-all-button {
-  width: auto;
-  height: auto;
-  font-size: 17px;
-  font-weight: 600;
-  padding: 12px 20px;
-  margin-bottom: 18px;
-  background: #333;
-  color: #fff;
-  border-color: #222;
-}
-.play-all-button:hover {
-  background: #222;
-}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const buttons = document.querySelectorAll('button[data-audio-id]');
-  const tracks = Array.from(document.querySelectorAll('audio'));
+  const rows = Array.from(document.querySelectorAll('tbody tr'));
+  const items = rows.map(row => {
+    const audio = row.querySelector('audio');
+    const durationEl = row.querySelector('.duration');
+    const title = row.querySelector('td').textContent.trim();
+    return { row, audio, durationEl, title };
+  }).filter(it => it.audio);
+
   const playAllButton = document.getElementById('playAll');
+  const nowTitle = document.getElementById('nowTitle');
+  const nowPlayBtn = document.getElementById('nowPlayBtn');
+  const nowRange = document.getElementById('nowRange');
+  const nowTime = document.getElementById('nowTime');
+
+  let nowActive = null;
   let playAllActive = false;
   let playAllIndex = 0;
 
@@ -124,101 +181,106 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const stopOtherTracks = (currentAudio) => {
-    tracks.forEach(track => {
-      if (track !== currentAudio) {
-        track.pause();
-      }
-    });
+  const stopOtherTracks = (current) => {
+    items.forEach(it => { if (it.audio !== current) it.audio.pause(); });
   };
 
-  buttons.forEach(button => {
-    const audio = document.getElementById(button.dataset.audioId);
-    if (!audio) return;
-    const progress = button.parentElement.querySelector('input[type="range"]');
-    const timeDisplay = button.parentElement.querySelector('.time');
+  const highlightRow = (row) => {
+    document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('active-row'));
+    if (row) row.classList.add('active-row');
+  };
 
-    const updateTime = () => {
-      const currentTime = formatTime(audio.currentTime);
-      const duration = formatTime(audio.duration);
-      if (progress) {
-        progress.value = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-      }
-      if (timeDisplay) {
-        timeDisplay.textContent = `${currentTime} / ${duration}`;
-      }
-    };
+  const setNowPlaying = (audio, title) => {
+    nowActive = audio;
+    nowTitle.textContent = title || 'Unknown';
+    nowPlayBtn.textContent = audio.paused ? '▶' : '⏸';
+    nowRange.disabled = false;
+    nowTime.textContent = audio.duration ? `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}` : '00:00 / --:--';
+    nowRange.value = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+  };
 
-    button.addEventListener('click', () => {
-      playAllActive = false;
-      const shouldPlay = audio.paused;
-      stopOtherTracks(audio);
-      if (shouldPlay) {
-        audio.play();
-      } else {
-        audio.pause();
+  const clearNowPlaying = () => {
+    nowActive = null;
+    nowTitle.textContent = 'Not playing';
+    nowPlayBtn.textContent = '▶';
+    nowRange.value = 0;
+    nowRange.disabled = true;
+    nowTime.textContent = '00:00 / --:--';
+    highlightRow(null);
+  };
+
+  nowRange.disabled = true;
+
+  // wire items
+  items.forEach((it, idx) => {
+    const { row, audio, durationEl, title } = it;
+
+    // populate duration when available
+    audio.addEventListener('loadedmetadata', () => {
+      if (durationEl) durationEl.textContent = formatTime(audio.duration || 0);
+      if (nowActive === audio) setNowPlaying(audio, title);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (nowActive === audio) {
+        nowRange.value = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        nowTime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
       }
     });
 
-    if (progress) {
-      progress.addEventListener('input', (event) => {
-        const activeTrack = tracks.find(track => !track.paused && !track.ended);
-        if (activeTrack && activeTrack !== audio) return;
-        if (!audio.duration) return;
-        const ratio = Number(event.target.value) / 100;
-        audio.currentTime = ratio * audio.duration;
-      });
-    }
-
-    audio.addEventListener('loadedmetadata', updateTime);
-    audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('play', () => {
-      button.textContent = '⏸';
+      setNowPlaying(audio, title);
+      highlightRow(row);
     });
     audio.addEventListener('pause', () => {
-      button.textContent = '▶';
-      if (playAllActive && !audio.ended) {
-        playAllActive = false;
-      }
+      nowPlayBtn.textContent = '▶';
+      // remove highlight on pause
+      if (nowActive === audio) highlightRow(null);
     });
     audio.addEventListener('ended', () => {
-      button.textContent = '▶';
-      updateTime();
-      if (playAllActive && tracks[playAllIndex] === audio) {
+      if (playAllActive && items[playAllIndex] && items[playAllIndex].audio === audio) {
         playAllIndex += 1;
-        if (playAllIndex < tracks.length) {
-          tracks[playAllIndex].play();
+        if (playAllIndex < items.length) {
+          items[playAllIndex].audio.play();
         } else {
           playAllActive = false;
+          clearNowPlaying();
         }
+      } else {
+        if (nowActive === audio) clearNowPlaying();
       }
     });
 
-    button.textContent = '▶';
-    updateTime();
+    // click row to play/pause this track
+    row.addEventListener('click', () => {
+      if (nowActive === audio) {
+        if (audio.paused) audio.play(); else audio.pause();
+        return;
+      }
+      playAllActive = false;
+      stopOtherTracks(audio);
+      audio.currentTime = audio.currentTime || 0;
+      audio.play();
+    });
+  });
+
+  nowPlayBtn.addEventListener('click', () => {
+    if (!nowActive) return;
+    if (nowActive.paused) nowActive.play(); else nowActive.pause();
+  });
+
+  nowRange.addEventListener('input', (e) => {
+    if (!nowActive || !nowActive.duration) return;
+    const ratio = Number(e.target.value) / 100;
+    nowActive.currentTime = ratio * nowActive.duration;
   });
 
   playAllButton.addEventListener('click', () => {
     playAllActive = true;
     playAllIndex = 0;
-
-    tracks.forEach(track => {
-      track.pause();
-      track.currentTime = 0;
-    });
-
-    document.querySelectorAll('input[type="range"]').forEach(range => {
-      range.value = 0;
-    });
-    document.querySelectorAll('.time').forEach(timeEl => {
-      timeEl.textContent = '00:00 / --:--';
-    });
-    document.querySelectorAll('button[data-audio-id]').forEach(btn => {
-      btn.textContent = '▶';
-    });
-
-    stopOtherTracks(tracks[0]);
-    tracks[0].play();
+    items.forEach(it => { it.audio.pause(); it.audio.currentTime = 0; if (it.durationEl) it.durationEl.textContent = formatTime(it.audio.duration || 0); });
+    clearNowPlaying();
+    if (items.length) items[0].audio.play();
   });
 });
 </script>
@@ -227,79 +289,66 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="container">
   <h1>Music tracks</h1>
   <p class="description">Simple Jukebox player.</p>
+
+  <div id="nowPlaying">
+    <span class="now-label"><strong>Now playing:</strong></span>
+    <span id="nowTitle">Not playing</span>
+    <button id="nowPlayBtn" type="button" class="play-all-button" style="margin-left:18px; padding:12px 18px; font-size:35px;">▶</button>
+    <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+      <input id="nowRange" type="range" min="0" max="100" step="0.1" value="0" />
+      <span id="nowTime" class="time">00:00 / --:--</span>
+    </div>
+  </div>
+
   <button id="playAll" class="play-all-button" type="button">Play all in order</button>
   <table>
     <thead>
       <tr>
         <th>Track</th>
-        <th>Player</th>
+        <th>Duration</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Dead are dancing too</td>
-        <td class="audio-cell">
-          <button type="button" class="track-button" data-audio-id="track1">▶</button>
-          <div class="track-progress">
-            <input type="range" min="0" max="100" step="0.1" value="0">
-            <span class="time">00:00 / --:--</span>
-          </div>
-          <audio id="track1" src="music/Dead_are_dancing_too-quicker - 11:08:2026, 23.30.mp3"></audio>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track1" src="music/Dead_are_dancing_too-quicker - 11:08:2026, 23.30.mp3" style="display:none"></audio>
         </td>
       </tr>
       <tr>
         <td>Lie to Me</td>
-        <td class="audio-cell">
-          <button type="button" class="track-button" data-audio-id="track2">▶</button>
-          <div class="track-progress">
-            <input type="range" min="0" max="100" step="0.1" value="0">
-            <span class="time">00:00 / --:--</span>
-          </div>
-          <audio id="track2" src="music/Lie_to_me_quicker - 13:07:2026, 09.50.mp3"></audio>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track2" src="music/Lie_to_me_quicker - 13:07:2026, 09.50.mp3" style="display:none"></audio>
         </td>
       </tr>
       <tr>
         <td>After Dark</td>
-        <td class="audio-cell">
-          <button type="button" class="track-button" data-audio-id="track3">▶</button>
-          <div class="track-progress">
-            <input type="range" min="0" max="100" step="0.1" value="0">
-            <span class="time">00:00 / --:--</span>
-          </div>
-          <audio id="track3" src="music/After Dark in Am - 10:07:2026, 17.22.mp3"></audio>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track3" src="music/After Dark in Am - 10:07:2026, 17.22.mp3" style="display:none"></audio>
         </td>
       </tr>
       <tr>
         <td>Falling Down</td>
-        <td class="audio-cell">
-          <button type="button" class="track-button" data-audio-id="track4">▶</button>
-          <div class="track-progress">
-            <input type="range" min="0" max="100" step="0.1" value="0">
-            <span class="time">00:00 / --:--</span>
-          </div>
-          <audio id="track4" src="music/Falling down band - 30:10:2025, 23.29.mp3"></audio>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track4" src="music/Falling down band - 30:10:2025, 23.29.mp3" style="display:none"></audio>
         </td>
       </tr>
       <tr>
         <td>Need it like a song</td>
-        <td class="audio-cell">
-          <button type="button" class="track-button" data-audio-id="track5">▶</button>
-          <div class="track-progress">
-            <input type="range" min="0" max="100" step="0.1" value="0">
-            <span class="time">00:00 / --:--</span>
-          </div>
-          <audio id="track5" src="music/Need_it_like_a_song_quicker - 12:08:2026, 23.26.mp3"></audio>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track5" src="music/Need_it_like_a_song_quicker - 12:08:2026, 23.26.mp3" style="display:none"></audio>
         </td>
       </tr>
       <tr>
         <td>Pack your bags for Nasvhille</td>
-        <td class="audio-cell">
-          <button type="button" class="track-button" data-audio-id="track6">▶</button>
-          <div class="track-progress">
-            <input type="range" min="0" max="100" step="0.1" value="0">
-            <span class="time">00:00 / --:--</span>
-          </div>
-          <audio id="track6" src="music/Nashville_quicker - 08:07:2026, 16.53.mp3"></audio>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track6" src="music/Nashville_quicker - 08:07:2026, 16.53.mp3" style="display:none"></audio>
         </td>
       </tr>
     </tbody>
