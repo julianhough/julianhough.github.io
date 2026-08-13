@@ -182,7 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const stopOtherTracks = (current) => {
-    items.forEach(it => { if (it.audio !== current) it.audio.pause(); });
+    items.forEach(it => {
+      if (it.audio !== current) {
+        it.audio.pause();
+        it.audio.currentTime = 0;
+      }
+    });
   };
 
   const highlightRow = (row) => {
@@ -259,14 +264,24 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       playAllActive = false;
       stopOtherTracks(audio);
-      audio.currentTime = audio.currentTime || 0;
+      audio.currentTime = 0;
       audio.play();
     });
   });
 
   nowPlayBtn.addEventListener('click', () => {
     if (!nowActive) return;
-    if (nowActive.paused) nowActive.play(); else nowActive.pause();
+    if (nowActive.paused) {
+      items.forEach(it => {
+        if (it.audio !== nowActive) {
+          it.audio.pause();
+          it.audio.currentTime = 0;
+        }
+      });
+      nowActive.play();
+    } else {
+      nowActive.pause();
+    }
   });
 
   nowRange.addEventListener('input', (e) => {
@@ -300,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 
-  <button id="playAll" class="play-all-button" type="button">Play all in order</button>
+  <button id="playAll" class="play-all-button" type="button">▶ Play all in order</button>
   <table>
     <thead>
       <tr>
@@ -341,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>Need it like a song</td>
         <td class="duration-cell">
           <span class="duration">--:--</span>
-          <audio id="track5" src="music/Need_it_like_a_song_quicker - 12:08:2026, 23.26.mp3" style="display:none"></audio>
+          <audio id="track5" src="music/Need_it_like_a_song_quicker - 13:08:2026, 14.54.mp3" style="display:none"></audio>
         </td>
       </tr>
       <tr>
