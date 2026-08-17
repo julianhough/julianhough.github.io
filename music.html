@@ -190,6 +190,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  const playTrack = (audio, title) => {
+    if (!audio) return;
+    stopOtherTracks(audio);
+    audio.currentTime = 0;
+    if (title) {
+      setNowPlaying(audio, title);
+    } else if (nowActive === audio) {
+      setNowPlaying(audio, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown');
+    }
+    audio.play();
+  };
+
   const highlightRow = (row) => {
     document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('active-row'));
     if (row) row.classList.add('active-row');
@@ -233,7 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('mediaSession' in navigator) {
     try {
       navigator.mediaSession.setActionHandler('play', () => {
-        if (nowActive) nowActive.play(); else if (items.length) items[0].audio.play();
+        if (nowActive) {
+          playTrack(nowActive, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown');
+        } else if (items.length) {
+          playTrack(items[0].audio, items[0].title);
+        }
       });
       navigator.mediaSession.setActionHandler('pause', () => {
         if (nowActive) nowActive.pause();
@@ -241,12 +257,12 @@ document.addEventListener('DOMContentLoaded', () => {
       navigator.mediaSession.setActionHandler('previoustrack', () => {
         if (!nowActive) return;
         const idx = items.findIndex(it => it.audio === nowActive);
-        if (idx > 0) items[idx - 1].audio.play();
+        if (idx > 0) playTrack(items[idx - 1].audio, items[idx - 1].title);
       });
       navigator.mediaSession.setActionHandler('nexttrack', () => {
         if (!nowActive) return;
         const idx = items.findIndex(it => it.audio === nowActive);
-        if (idx >= 0 && idx < items.length - 1) items[idx + 1].audio.play();
+        if (idx >= 0 && idx < items.length - 1) playTrack(items[idx + 1].audio, items[idx + 1].title);
       });
       navigator.mediaSession.setActionHandler('seekto', (details) => {
         if (!nowActive || !nowActive.duration) return;
@@ -304,26 +320,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // click row to play/pause this track
     row.addEventListener('click', () => {
       if (nowActive === audio) {
-        if (audio.paused) audio.play(); else audio.pause();
+        if (audio.paused) {
+          playTrack(audio, title);
+        } else {
+          audio.pause();
+        }
         return;
       }
       playAllActive = false;
-      stopOtherTracks(audio);
-      audio.currentTime = 0;
-      audio.play();
+      playTrack(audio, title);
     });
   });
 
   nowPlayBtn.addEventListener('click', () => {
     if (!nowActive) return;
     if (nowActive.paused) {
-      items.forEach(it => {
-        if (it.audio !== nowActive) {
-          it.audio.pause();
-          it.audio.currentTime = 0;
-        }
-      });
-      nowActive.play();
+      playTrack(nowActive, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown');
     } else {
       nowActive.pause();
     }
@@ -340,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playAllIndex = 0;
     items.forEach(it => { it.audio.pause(); it.audio.currentTime = 0; if (it.durationEl) it.durationEl.textContent = formatTime(it.audio.duration || 0); });
     clearNowPlaying();
-    if (items.length) items[0].audio.play();
+    if (items.length) playTrack(items[0].audio, items[0].title);
   });
 });
 </script>
