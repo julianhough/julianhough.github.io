@@ -108,6 +108,24 @@ button {
 button:hover {
   background: #f3f3f3;
 }
+.click-track-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: auto;
+  padding: 10px 16px;
+  font-size: 24px;
+  line-height: 1.2;
+  border-radius: 8px;
+}
+.click-track-button.is-active {
+  background: #eaf7ea;
+  border-color: #2e7d32;
+}
+.click-track-button .click-icon {
+  font-size: 22px;
+  line-height: 1;
+}
 .play-all-button {
   width: auto;
   height: auto;
@@ -241,6 +259,113 @@ document.addEventListener('DOMContentLoaded', () => {
 
   nowRange.disabled = true;
 
+  const metronomeState = {
+    audioContext: null,
+    intervalId: null,
+    isRunning: false,
+    currentRow: null,
+  };
+
+  const getMetronomeAudioContext = () => {
+    if (!metronomeState.audioContext) {
+      const AudioCtor = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtor) return null;
+      metronomeState.audioContext = new AudioCtor();
+    }
+    return metronomeState.audioContext;
+  };
+
+  const playMetronomeClick = () => {
+    const audioContext = getMetronomeAudioContext();
+    if (!audioContext) return;
+
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.type = 'square';
+    oscillator.frequency.value = 440;
+    gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.25, audioContext.currentTime + 0.005);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.08);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.09);
+  };
+
+  const setClickButtonState = (button, isActive) => {
+    button.classList.toggle('is-active', isActive);
+    const icon = button.querySelector('.click-icon');
+    if (icon) {
+      icon.textContent = isActive ? '⏸' : '▶';
+    }
+  };
+
+  const stopMetronome = () => {
+    if (metronomeState.intervalId) {
+      clearInterval(metronomeState.intervalId);
+      metronomeState.intervalId = null;
+    }
+    metronomeState.isRunning = false;
+    metronomeState.currentRow = null;
+
+    document.querySelectorAll('.click-track-button').forEach(button => {
+      setClickButtonState(button, false);
+    });
+  };
+
+  const startMetronome = (button) => {
+    if (!button) return;
+
+    const row = button.closest('tr');
+    const bpm = Number(button.dataset.bpm || 120);
+    if (!row || !Number.isFinite(bpm) || bpm <= 0) return;
+
+    if (metronomeState.currentRow && metronomeState.currentRow !== row) {
+      stopMetronome();
+    }
+
+    const intervalMs = (60 / bpm) * 1000;
+    metronomeState.currentRow = row;
+    metronomeState.isRunning = true;
+    setClickButtonState(button, true);
+    playMetronomeClick();
+    metronomeState.intervalId = setInterval(() => {
+      if (!metronomeState.isRunning || metronomeState.currentRow !== row) return;
+      playMetronomeClick();
+    }, intervalMs);
+  };
+
+  document.querySelectorAll('.chords-link, .bass-tab-link, .click-track-button').forEach(link => {
+    link.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+  });
+
+  document.querySelectorAll('.click-track-button').forEach(button => {
+    if (!button.dataset.bpm) {
+      button.dataset.bpm = '120';
+    }
+    button.innerHTML = '<span class="click-icon">▶</span> <span class="click-label">click</span>';
+
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const row = button.closest('tr');
+      if (!row) return;
+
+      if (metronomeState.currentRow === row && metronomeState.isRunning) {
+        stopMetronome();
+        return;
+      }
+
+      startMetronome(button);
+    });
+  });
+
   // Media Session API: wire device display and remote controls when available
   if ('mediaSession' in navigator) {
     try {
@@ -360,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <body>
 <div class="container">
   <h1>Silvertones</h1>
-  <p class="description">Simple Jukebox player.</p>
+  <p class="description">Simple Band Toolkit.</p>
 
   <div id="nowPlaying">
     <span class="now-label"><strong>Now playing:</strong></span>
@@ -378,6 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <tr>
         <th>Track</th>
         <th>Duration</th>
+        <th>Chords</th>
+        <th>Bass tab</th>
+        <th>Click track</th>
       </tr>
     </thead>
     <tbody>
@@ -387,6 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="duration">--:--</span>
           <audio id="track1" src="music/Dead_are_dancing_too-quicker - 19:08:2026, 00.00.mp3" style="display:none"></audio>
         </td>
+        <td><a class="chords-link" href="music/Dead are dancing too_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><a class="bass-tab-link" href="music/Dead are dancing too_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a></td>
+        <td><button type="button" class="click-track-button" data-bpm="75"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
       </tr>
       <tr>
         <td>Lie to Me (Chris Isaak)</td>
@@ -394,6 +525,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="duration">--:--</span>
           <audio id="track2" src="music/Lie_to_me_quicker - 13:07:2026, 09.50.mp3" style="display:none"></audio>
         </td>
+        <td><a class="chords-link" href="music/Lie to Me (Chris Isaak)_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><a class="bass-tab-link" href="music/Lie to Me (Chris Isaak)_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a></td>
+        <td><button type="button" class="click-track-button" data-bpm="120"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
       </tr>
       <tr>
         <td>After Dark (Tito and Tarantula)</td>
@@ -401,6 +535,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="duration">--:--</span>
           <audio id="track3" src="music/After Dark in Am - 10:07:2026, 17.22.mp3" style="display:none"></audio>
         </td>
+        <td><a class="chords-link" href="music/After Dark (Tito and Tarantula)_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><a class="bass-tab-link" href="music/After Dark (Tito and Tarantula)_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a></td>
+        <td><button type="button" class="click-track-button" data-bpm="120"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
       </tr>
       <tr>
         <td>Falling Down</td>
@@ -408,20 +545,29 @@ document.addEventListener('DOMContentLoaded', () => {
           <span class="duration">--:--</span>
           <audio id="track4" src="music/Falling down band - 30:10:2025, 23.29.mp3" style="display:none"></audio>
         </td>
+        <td><a class="chords-link" href="music/Falling Down_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><!--<a class="bass-tab-link" href="music/Falling Down_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a>--></td>
+        <td><button type="button" class="click-track-button" data-bpm="120"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
       </tr>
       <tr>
         <td>Need it like a song</td>
         <td class="duration-cell">
           <span class="duration">--:--</span>
-          <audio id="track5" src="music/Need_it_like_a_song_quicker - 15:08:2026, 22.40.mp3" style="display:none"></audio>
+          <audio id="track5" src="music/Need_it_like_a_song_quicker.mp3" style="display:none"></audio>
         </td>
+        <td><a class="chords-link" href="music/Need it like a song_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><a class="bass-tab-link" href="music/Need it like a song_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a></td>
+        <td><button type="button" class="click-track-button" data-bpm="90"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
       </tr>
       <tr>
-        <td>Pack your bags for Nasvhille</td>
+        <td>Pack your bags for Nashville</td>
         <td class="duration-cell">
           <span class="duration">--:--</span>
           <audio id="track6" src="music/Nashville_quicker - 14:08:2026, 16.48.mp3" style="display:none"></audio>
         </td>
+        <td><a class="chords-link" href="music/Pack your bags for Nashville_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><a class="bass-tab-link" href="music/Pack your bags for Nashville_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a></td>
+        <td><button type="button" class="click-track-button" data-bpm="120"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
       </tr>
     </tbody>
   </table>
