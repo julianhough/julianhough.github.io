@@ -49,7 +49,9 @@ th {
 tbody tr.active-row td {
   background: #fff59d;
   color: #1a1a1a;
-  font-weight: 600;
+}
+tbody tr:hover td {
+  background: #dff3df;
 }
 .audio-cell {
   display: flex;
@@ -350,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!button.dataset.bpm) {
       button.dataset.bpm = '120';
     }
-    button.innerHTML = '<span class="click-icon">▶</span> <span class="click-label">click</span>';
+    button.innerHTML = `<span class="click-icon">▶</span> <span class="click-label">Click [${button.dataset.bpm}]</span>`;
 
     button.addEventListener('click', (event) => {
       event.stopPropagation();
