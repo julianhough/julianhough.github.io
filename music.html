@@ -30,6 +30,13 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+thead th:first-child,
+tbody td:first-child {
+  white-space: nowrap;
+}
+.track-table-scroll {
+  overflow-x: auto;
+}
 tbody tr { cursor: pointer; }
 th, td {
   border: 1px solid #d1d1d1;
@@ -52,6 +59,22 @@ tbody tr.active-row td {
 }
 tbody tr:hover td {
   background: #dff3df;
+}
+.track-play-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  margin-right: 8px;
+  font-size: 24px;
+  line-height: 1;
+  vertical-align: middle;
+}
+.track-play-indicator.is-visible {
+  height: 32px;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
 }
 .audio-cell {
   display: flex;
@@ -152,9 +175,21 @@ button:hover {
   display: block;
 }
 #nowPlaying .now-label {
-  display: inline-block;
-  margin-right: 8px;
+  display: block;
+  margin-bottom: 4px;
   color: #333;
+}
+#nowPlayBtn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 18px 0 0;
+  padding: 0;
+  font-size: 35px;
+  line-height: 1;
 }
 #nowRange {
   width: 100%;
@@ -180,8 +215,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const items = rows.map(row => {
     const audio = row.querySelector('audio');
     const durationEl = row.querySelector('.duration');
-    const title = row.querySelector('td').textContent.trim();
-    return { row, audio, durationEl, title };
+    const titleCell = row.querySelector('td');
+    const title = titleCell.textContent.trim();
+    const playIndicator = document.createElement('span');
+    playIndicator.className = 'track-play-indicator';
+    playIndicator.setAttribute('aria-hidden', 'true');
+    const titleLabel = document.createElement('span');
+    titleLabel.textContent = title;
+    titleCell.replaceChildren(playIndicator, titleLabel);
+    return { row, audio, durationEl, title, playIndicator };
   }).filter(it => it.audio);
 
   const playAllButton = document.getElementById('playAll');
@@ -210,10 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const playTrack = (audio, title) => {
+  const playTrack = (audio, title, restartFromBeginning = true) => {
     if (!audio) return;
     stopOtherTracks(audio);
-    audio.currentTime = 0;
+    if (restartFromBeginning) audio.currentTime = 0;
     if (title) {
       setNowPlaying(audio, title);
     } else if (nowActive === audio) {
@@ -227,10 +269,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (row) row.classList.add('active-row');
   };
 
+  const updateRowPlayIndicators = (audio, isPlaying) => {
+    items.forEach(it => {
+      const isCurrentTrack = it.audio === audio;
+      it.playIndicator.classList.toggle('is-visible', isCurrentTrack);
+      it.playIndicator.textContent = isCurrentTrack ? (isPlaying ? '⏸' : '▶') : '';
+    });
+  };
+
   const setNowPlaying = (audio, title) => {
     nowActive = audio;
     nowTitle.textContent = title || 'Unknown';
     nowPlayBtn.textContent = audio.paused ? '▶' : '⏸';
+    updateRowPlayIndicators(audio, !audio.paused);
     nowRange.disabled = false;
     nowTime.textContent = audio.duration ? `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}` : '00:00 / --:--';
     nowRange.value = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
@@ -253,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nowActive = null;
     nowTitle.textContent = 'Not playing';
     nowPlayBtn.textContent = '▶';
+    updateRowPlayIndicators(null, false);
     nowRange.value = 0;
     nowRange.disabled = true;
     nowTime.textContent = '00:00 / --:--';
@@ -373,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       navigator.mediaSession.setActionHandler('play', () => {
         if (nowActive) {
-          playTrack(nowActive, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown');
+          playTrack(nowActive, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown', false);
         } else if (items.length) {
           playTrack(items[0].audio, items[0].title);
         }
@@ -427,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     audio.addEventListener('pause', () => {
       nowPlayBtn.textContent = '▶';
+      if (nowActive === audio) updateRowPlayIndicators(audio, false);
       // remove highlight on pause
       if (nowActive === audio) highlightRow(null);
     });
@@ -448,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     row.addEventListener('click', () => {
       if (nowActive === audio) {
         if (audio.paused) {
-          playTrack(audio, title);
+          playTrack(audio, title, false);
         } else {
           audio.pause();
         }
@@ -462,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
   nowPlayBtn.addEventListener('click', () => {
     if (!nowActive) return;
     if (nowActive.paused) {
-      playTrack(nowActive, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown');
+      playTrack(nowActive, nowTitle.textContent !== 'Not playing' ? nowTitle.textContent : 'Unknown', false);
     } else {
       nowActive.pause();
     }
@@ -491,8 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <div id="nowPlaying">
     <span class="now-label"><strong>Now playing:</strong></span>
+    <button id="nowPlayBtn" type="button" class="play-all-button">▶</button>
     <span id="nowTitle">Not playing</span>
-    <button id="nowPlayBtn" type="button" class="play-all-button" style="margin-left:18px; padding:12px 18px; font-size:35px;">▶</button>
     <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
       <input id="nowRange" type="range" min="0" max="100" step="0.1" value="0" />
       <span id="nowTime" class="time">00:00 / --:--</span>
@@ -500,6 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <button id="playAll" class="play-all-button" type="button">▶ Play all in order</button>
+  <div class="track-table-scroll">
   <table>
     <thead>
       <tr>
@@ -573,6 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </tr>
     </tbody>
   </table>
+  </div>
 </div>
 </body>
 </html>
