@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Silvertones</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f2f2;
+  margin: 0;
+  padding: 24px;
+  font-size: 150%;
+  color: #222;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 36px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+h1 {
+  margin-top: 0;
+}
+p.description {
+  margin: 0 0 20px;
+  color: #555;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th:first-child,
+tbody td:first-child {
+  white-space: nowrap;
+}
+.track-table-scroll {
+  overflow-x: auto;
+}
+tbody tr:has(audio) { cursor: pointer; }
+tbody tr.non-track-row { cursor: default; }
+th, td {
+  border: 1px solid #d1d1d1;
+  padding: 18px 21px;
+}
+th {
+  background: #e6e6e6;
+  text-align: left;
+}
+/* highlight the active (playing) table row */
+.active-row {
+  background: #fff59d;
+  box-shadow: inset 4px 0 0 0 #ffc107;
+  transition: background 0.12s ease;
+}
+/* ensure the whole row cells are highlighted */
+tbody tr.active-row td {
+  background: #fff59d;
+  color: #1a1a1a;
+}
+tbody tr:has(audio):hover td {
+  background: #dff3df;
+}
+.track-play-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  margin-right: 8px;
+  font-size: 24px;
+  line-height: 1;
+  vertical-align: middle;
+}
+.track-play-indicator.is-visible {
+  height: 32px;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+}
+.audio-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+button {
+  font: inherit;
+  padding: 12px 21px;
+  border: 1px solid #999;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  height: 60px;
+  font-size: 27px;
+  line-height: 1;
+}
+.track-button {
+  width: 72px;
+}
+.track-progress {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.track-progress input[type="range"] {
+  width: 100%;
+  appearance: none;
+  height: 15px;
+  border-radius: 8px;
+  background: #b0b0b0;
+  cursor: pointer;
+}
+.track-progress input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+  margin-top: -3px;
+}
+.track-progress input[type="range"]::-moz-range-thumb {
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+}
+.track-progress .time {
+  min-width: 120px;
+  color: #444;
+  font-size: 30px;
+}
+button:hover {
+  background: #f3f3f3;
+}
+.click-track-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: auto;
+  padding: 10px 16px;
+  font-size: 24px;
+  line-height: 1.2;
+  border-radius: 8px;
+}
+.click-track-button.is-active {
+  background: #eaf7ea;
+  border-color: #2e7d32;
+}
+.click-track-button .click-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.play-all-button {
+  width: auto;
+  height: auto;
+  font-size: 39px;
+  font-weight: 600;
+  padding: 18px 30px;
+  margin-bottom: 20px;
+  background: #333;
+  color: #fff;
+  border-color: #222;
+}
+.play-all-button:hover {
+  background: #222;
+}
+
+/* Now playing bar */
+#nowPlaying {
+  margin: 12px 0 18px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fafafa;
+  display: block;
+}
+#nowPlaying .now-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #333;
+}
+#nowPlayBtn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 18px 0 0;
+  padding: 0;
+  font-size: 35px;
+  line-height: 1;
+}
+#nowRange {
+  width: 100%;
+  appearance: none;
+  height: 10px;
+  border-radius: 6px;
+  background: #b0b0b0;
+  cursor: pointer;
+}
+#nowRange::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+  margin-top: -2px;
+}
+</style>
+<script src="music_player.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1>Julian Charles and the Silvertone Six "Pack Your Bags For Nashville" Single</h1>
+  <p class="description">Click song to play</p>
+
+  <div id="nowPlaying">
+    <span class="now-label"><strong>Now playing:</strong></span>
+    <button id="nowPlayBtn" type="button" class="play-all-button">▶</button>
+    <span id="nowTitle">Not playing</span>
+    <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+      <input id="nowRange" type="range" min="0" max="100" step="0.1" value="0" />
+      <span id="nowTime" class="time">00:00 / --:--</span>
+    </div>
+  </div>
+
+  <button id="playAll" class="play-all-button" type="button">▶ Play all in order</button>
+  <div class="track-table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Track</th>
+        <th>Duration</th>
+        <th>Chords</th>
+        <th>Bass tab</th>
+        <th>Click track</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>Pack your bags for Nashville</td>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track1" src="music/Nashville_quicker - 29:10:2026, 22.02.mp3" style="display:none"></audio>
+        </td>
+        <td><a class="chords-link" href="music/Pack your bags for Nashville_chords.pdf" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><!--<a class="bass-tab-link" href="music/Pack your bags for Nashville_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a>--></td>
+        <td><button type="button" class="click-track-button" data-bpm="79"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
+      </tr>
+            
+      <tr class="non-track-row">
+        <td colspan="5">
+          References:
+  
+              <p><a href="https://www.youtube.com/watch?v=Tu3ypuKq8WE" target="_blank">Dwight Yoakham</a></p>
+              
+              <p><a href="https://www.youtube.com/watch?v=wtVeDaZxAXo" target="_blank">George Strait</a></p>
+              <p>Notes: would quite like a lap-steel sound instead of lead guitar.
+
+        </td>
+      </tr> 
+      <tr class="non-track-row">
+        <td colspan="5" style="background: #e6e6e6;">
+          Possible B sides:
+        </td>
+      </tr> 
+            <tr>
+        <td>Falling Down</td>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track2" src="music/Falling_down_band_-_07_11_2025_18_11.mp3" style="display:none"></audio>
+        </td>
+        <td><a class="chords-link" href="music/Falling Down_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><!--<a class="bass-tab-link" href="music/Falling Down_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a>--></td>
+        <td><button type="button" class="click-track-button" data-bpm="92"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
+      </tr>
+      <tr>
+        <td>Dead are gonna dance</td>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track3" src="music/Dead_are_dancing_too-quicker - 27:10:2026, 22.56.mp3" style="display:none"></audio>
+        </td>
+        <td><a class="chords-link" href="music/Dead are gonna dance_chords.txt" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><a class="bass-tab-link" href="music/Dead are gonna dance_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a></td>
+        <td><button type="button" class="click-track-button" data-bpm="155"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
+      </tr>
+      <tr>
+        <td>Need it like a song</td>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track4" src="music/Need_it_like_a_song.mp3" style="display:none"></audio>
+        </td>
+        <td><a class="chords-link" href="music/Need it like a song_chords.pdf" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><!--<a class="bass-tab-link" href="music/Need it like a song_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a>--></td>
+        <td><button type="button" class="click-track-button" data-bpm="90"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
+      </tr>
+      <tr>
+        <td>Hard Times</td>
+        <td class="duration-cell">
+          <span class="duration">--:--</span>
+          <audio id="track5" src="music/Hard_times - 07:11:2026, 14.15.mp3" style="display:none"></audio>
+        </td>
+        <td><a class="chords-link" href="music/Hard times_chords.pdf" target="_blank" rel="noopener noreferrer">chords</a></td>
+        <td><!--<a class="bass-tab-link" href="music/Hard Times_bass_tab.txt" target="_blank" rel="noopener noreferrer">bass tab</a>--></td>
+        <td><button type="button" class="click-track-button" data-bpm="67"><span class="click-icon">▶</span> <span class="click-label">click</span></button></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+</body>
+</html>
