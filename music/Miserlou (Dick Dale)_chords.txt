@@ -1,20 +1,25 @@
 Part 1 (theme):
-E   E    E     E (no chords in opening)
-E   E    E     E 
-F   F    E     E 
-F   F    E     E
+
+E    E    E     E      (no chords in opening)
+E    E    E     E 
+F    F    E     E 
+F    F    E     E
 
 (Repeat Part 1 higher theme)
 
+
 Part 2 (bridge):
-A   A    G     G
-F   F    E     E
-F   F    E     E
-F   F    E     E
+
+A    A    G     G
+F    F    E     E
+F    F    E     E
+F    F    E     E
 
 (Second repeat of bridge no chords first two line and a half until E E)
 
-Interim before Part 1 starts again
+
+Interim before Part 1 starts again:
+
 E  E    E    E
 E  E
 
