@@ -1,6 +1,6 @@
 Part 1 (theme):
 E   E    E     E (no chords in opening)
-E   E    E     E
+E   E    E     E 
 F   F    E     E 
 F   F    E     E
 
@@ -16,6 +16,6 @@ F   F    E     E
 
 Interim before Part 1 starts again
 E  E    E    E
-E  E    E    E
+E  E
 
 Part 1 x forever
